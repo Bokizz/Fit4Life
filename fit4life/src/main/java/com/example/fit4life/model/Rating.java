@@ -31,7 +31,7 @@ public class Rating {
     private Studio studio;
 
     @Column(nullable = false)
-    private int ratingValue; // Assuming rating is an integer value
+    private int ratingValue; 
 
     public Long getId() {
         return id;

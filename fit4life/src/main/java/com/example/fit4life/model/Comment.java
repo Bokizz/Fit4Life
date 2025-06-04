@@ -1,16 +1,17 @@
 package com.example.fit4life.model;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 @NoArgsConstructor
@@ -29,7 +30,7 @@ public class Comment {
 
     private LocalDateTime createdAt; // Timestamp when the comment was created
     private boolean edited = false; // Indicates if the comment has been edited
-    
+    private LocalDateTime editedAt; // Timestamp when the comment was last edited
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -53,6 +54,12 @@ public class Comment {
     }
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public void setEditedAt(LocalDateTime editedAt) {
+        this.editedAt = editedAt;
+    }
+    public LocalDateTime getEditedAt() {
+        return editedAt;
     }
     public boolean isEdited() {
         return edited;
