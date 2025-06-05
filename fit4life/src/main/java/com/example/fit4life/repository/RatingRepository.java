@@ -11,4 +11,5 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     void deleteByUserId(Long userId);
     // 🔍 Find all ratings for a specific studio
     List<Rating> findByStudioId(Long studioId);
+    List<Rating> findByUserId(Long userId);
 }

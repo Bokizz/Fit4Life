@@ -1,11 +1,8 @@
 package com.example.fit4life.model;
 
-import jakarta.persistence.GenerationType;
-
-import java.time.LocalDate;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -29,10 +26,7 @@ public class Subscription {
     @ManyToOne(optional = false)
     private Studio studio;
 
-    private boolean active; // Indicates if the subscription is currently active
-    private LocalDate startDate; // Start date of the subscription
-    private LocalDate endDate; // End date of the subscription
-    private double price; // Price of the subscription
+    private int duration;
 
     // Getters and Setters
     public Long getId() {
@@ -52,31 +46,10 @@ public class Subscription {
         this.studio = studio;
     }
 
-    public boolean isActive() {
-        return active;
+    public int getDuration() {
+        return duration;
     }
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-    public void setPrice(double price) {
-        this.price = price;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 }

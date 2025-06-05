@@ -48,6 +48,9 @@ public class Studio {
     @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "studio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subscription> subscriptions;
+
     @Column(name = "average_rating")
     private Double averageRating = 0.0;
 
@@ -109,5 +112,11 @@ public class Studio {
     }
     public void setAverageRating(Double averageRating) {
         this.averageRating = averageRating;
+    }
+    public List<Subscription> getSubscriptions() {
+        return subscriptions;
+    }
+    public void setSubscriptions(List<Subscription> subscriptions) {
+        this.subscriptions = subscriptions;
     }
 }

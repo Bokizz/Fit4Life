@@ -1,18 +1,18 @@
 package com.example.fit4life.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.fit4life.model.Rating;
-import com.example.fit4life.repository.RatingRepository;    
-import com.example.fit4life.repository.UserRepository;
-import com.example.fit4life.repository.StudioRepository;
-
-import java.util.List;
-
-import com.example.fit4life.model.User;
 import com.example.fit4life.model.Studio;
+import com.example.fit4life.model.User;
+import com.example.fit4life.repository.RatingRepository;
+import com.example.fit4life.repository.StudioRepository;
+import com.example.fit4life.repository.UserRepository;
 
 @Service
 public class RatingServiceImpl implements RatingService {
@@ -37,13 +37,22 @@ public class RatingServiceImpl implements RatingService {
             existingRating.setRatingValue(ratingValue);
             return ratingRepository.save(existingRating);
         } else {
+            Optional<User> user = userRepository.findById(userId);
+            Optional<Studio> studio = studioRepository.findById(studioId);
+            if(user.isEmpty() || studio.isEmpty()) {
+                throw new IllegalArgumentException("User or Studio not found");
+            }
+            if(user.get().isBanned()) {
+                throw new IllegalArgumentException("User is banned and cannot rate studios");
+            }
+            if(ratingValue < 1 || ratingValue > 10) {
+                throw new IllegalArgumentException("Rating value must be between 1 and 10");
+            }
             // Create a new rating
             Rating newRating = new Rating();
-            newRating.setUser(userRepository.findById(userId).orElse(null));
-            newRating.setStudio(studioRepository.findById(studioId).orElse(null));
             newRating.setRatingValue(ratingValue);
-            newRating.setUser(userRepository.findById(userId).orElse(null));
-            newRating.setStudio(studioRepository.findById(studioId).orElse(null));
+            newRating.setUser(user.get());
+            newRating.setStudio(studio.get());
             return ratingRepository.save(newRating);
         }
     }
@@ -97,6 +106,10 @@ public class RatingServiceImpl implements RatingService {
         });
         updateAverageRating(studioId);
         ratingRepository.deleteById(id);
+    }
+    @Override
+    public List<Rating> getRatingsByUser(Long userId) {
+        return ratingRepository.findByUserId(userId);
     }
 
     private void updateAverageRating(Long studioId) {

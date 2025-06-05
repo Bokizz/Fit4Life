@@ -7,6 +7,7 @@ public interface RatingService {
     Rating addOrUpdateRating(Long userId, Long studioId, int ratingValue);
     List<Rating> getAllRatings();
     List<Rating> getRatingsByStudio(Long studioId);
+    List<Rating> getRatingsByUser(Long userId);
     Rating getRatingByUserAndStudio(Long userId, Long studioId);
     void deleteRating(Long id);
 }

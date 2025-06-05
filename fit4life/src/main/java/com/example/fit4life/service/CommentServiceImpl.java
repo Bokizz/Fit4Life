@@ -2,20 +2,16 @@ package com.example.fit4life.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+
 import com.example.fit4life.model.Comment;
 import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.User;
 import com.example.fit4life.repository.CommentRepository;
 import com.example.fit4life.repository.StudioRepository;
 import com.example.fit4life.repository.UserRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
-import com.example.fit4life.service.CommentService;
-import com.example.fit4life.model.Comment;
-import com.example.fit4life.model.User;
 @Service
 public class CommentServiceImpl implements CommentService{
     private final CommentRepository commentRepository;
@@ -35,7 +31,10 @@ public class CommentServiceImpl implements CommentService{
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Studio studio = studioRepository.findById(studioId)
                 .orElseThrow(() -> new IllegalArgumentException("Studio not found"));
-        if(user.isChatRestricted()) {
+            if(user.isBanned()) {
+                throw new IllegalArgumentException("User is banned and cannot comment");
+            }
+                if(user.isChatRestricted()) {
             throw new IllegalArgumentException("User is restricted from commenting");
         } else {
         Comment comment = new Comment();
@@ -53,8 +52,11 @@ public class CommentServiceImpl implements CommentService{
         if (existingComment.isEdited()) {
             throw new IllegalArgumentException("Comment has already been edited");
         }
-        if(existingComment.getUser().isChatRestricted()) {
+        if(existingComment.getUser().isChatRestricted() ) {
             throw new IllegalArgumentException("User is restricted from editing comments");
+        }
+        if (existingComment.getUser().isBanned()) {
+            throw new IllegalArgumentException("User is banned and cannot edit comments");
         }
         if (content == null || content.trim().isEmpty()) {
             throw new IllegalArgumentException("Content cannot be empty");
