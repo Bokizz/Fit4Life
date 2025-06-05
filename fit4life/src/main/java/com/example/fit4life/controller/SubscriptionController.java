@@ -13,22 +13,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.fit4life.model.Subscription;
-import com.example.fit4life.service.StudioService;
 import com.example.fit4life.service.SubscriptionService;
-import com.example.fit4life.service.UserService;
 
 @RestController
 @RequestMapping("/api/subscriptions")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
-    private final UserService userService;
-    private final StudioService studioService;
 
     @Autowired
-    public SubscriptionController(SubscriptionService subscriptionService, UserService userService, StudioService studioService) {
+    public SubscriptionController(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
-        this.userService = userService;
-        this.studioService = studioService;
     }
 
     @PostMapping("/subscribe")

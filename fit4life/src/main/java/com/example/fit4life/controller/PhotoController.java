@@ -12,35 +12,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.fit4life.model.Photo;
-import com.example.fit4life.model.Studio;
-import com.example.fit4life.model.User;
 import com.example.fit4life.service.PhotoService;
-import com.example.fit4life.service.StudioService;
-import com.example.fit4life.service.UserService;
-
-import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/photos")
 public class PhotoController {
     private PhotoService photoService;
-    private UserService userService; 
-    private StudioService studioService; 
+
     @Autowired
-    public PhotoController(PhotoService photoService, UserService userService, StudioService studioService) {
+    public PhotoController(PhotoService photoService) {
         this.photoService = photoService;
-        this.userService = userService;
-        this.studioService = studioService;
     }
-    
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
     public Photo uploadPhoto(@RequestBody Photo photo, @PathVariable Long userId, @PathVariable Long studioId,
                              @RequestParam String url, @RequestParam String description) {
-        User user = userService.getUserById(userId);
-        Studio studio = studioService.getStudioById(studioId);
         return photoService.uploadPhoto(photo, userId, studioId, url, description);
     }
 
