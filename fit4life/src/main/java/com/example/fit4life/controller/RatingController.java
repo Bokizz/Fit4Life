@@ -45,7 +45,7 @@ public class RatingController {
         }
 
 
-        Rating rating = ratingService.addOrUpdateRating(user, studio, ratingValue);
+        Rating rating = ratingService.addOrUpdateRating(userId, studioId, ratingValue);
         return ResponseEntity.ok(rating);
     }
     

@@ -6,7 +6,7 @@ import com.example.fit4life.model.enumeration.StudioType;
 
 public interface StudioService {
     Studio createStudio(Studio studio);
-    Studio updateStudio(Long id, Studio studio);
+    Studio updateStudio(Long id, String name, String locatio);
     Studio getStudioById(Long id);
     List<Studio> getAllStudios();  
     List<Studio> searchByName(String keyword);

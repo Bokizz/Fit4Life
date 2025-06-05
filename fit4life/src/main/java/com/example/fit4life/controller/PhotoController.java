@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,61 +21,64 @@ import com.example.fit4life.service.PhotoService;
 import com.example.fit4life.service.StudioService;
 import com.example.fit4life.service.UserService;
 
+import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/photos")
 public class PhotoController {
-    // This class will handle HTTP requests related to photos
-    // It will use PhotoService to perform operations like upload, delete, and fetch photos
-    // Methods will be added here as needed for the application functionality
-    // Example methods could include:
-    // - uploadPhoto(Photo photo)
-    // - getPhotosByStudio(Long studioId)
-    // - deletePhoto(Long photoId)
-    // - getAllPhotos()
-    // Note: Actual implementation will depend on the specific requirements and design of the application
-    // Placeholder for future methods and logic
-    @Autowired
     private PhotoService photoService;
-    
+    private UserService userService; 
+    private StudioService studioService; 
     @Autowired
-    private UserService userService; // Assuming you have a UserService for user-related operations
-    
-    @Autowired
-    private StudioService studioService; // Assuming you have a StudioService for studio-related operations
+    public PhotoController(PhotoService photoService, UserService userService, StudioService studioService) {
+        this.photoService = photoService;
+        this.userService = userService;
+        this.studioService = studioService;
+    }
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
-    public Photo uploadPhoto(@RequestBody Photo photo) {
-        // Validate studio exists
-        Studio studio = studioService.getStudioById(photo.getStudio().getId());
-        if (studio == null) {
-            throw new RuntimeException("Studio not found");
-        }
-
-        // Get the current authenticated user
-        org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User currentUser = userService.findByUsername(username);
-
-        // Set the uploadedBy field
-        photo.setUploadedBy(currentUser);
-        // Set the studio field
-        photo.setStudio(studio);
-
-        // Save the photo
-        return photoService.uploadPhoto(photo);
+    public Photo uploadPhoto(@RequestBody Photo photo, @PathVariable Long userId, @PathVariable Long studioId,
+                             @RequestParam String url, @RequestParam String description) {
+        User user = userService.getUserById(userId);
+        Studio studio = studioService.getStudioById(studioId);
+        return photoService.uploadPhoto(photo, userId, studioId, url, description);
     }
 
-    // Fetch photos by studio ID
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{photoId}")
+    public Photo updatePhoto(@PathVariable Long photoId, @RequestBody Photo photo,
+                             @RequestParam String url, @RequestParam String description) throws NotFoundException {
+        Photo existingPhoto = photoService.getPhotoById(photoId);
+        if (existingPhoto == null) {
+            throw new NotFoundException();
+        }
+        return photoService.updatePhoto(photo, url, description);
+    }
+
     @GetMapping("/studio/{studioId}")
     public List<Photo> getPhotosByStudio(@PathVariable Long studioId) {
         return photoService.getPhotosByStudio(studioId);
     }
 
-    // Delete the photo
+    @GetMapping("/{photoId}")
+    public Photo getPhotoById(@PathVariable Long photoId) {
+        return photoService.getPhotoById(photoId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Photo> getPhotosByUploadedBy(@PathVariable Long userId) {
+        return photoService.getPhotosByUploadedBy(userId);
+    }
+    
+    @GetMapping("/all/photos")
+    public List<Photo> getAllPhotos() {
+        return photoService.getAllPhotos();
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{photoId}")
+    @DeleteMapping("/delete/{photoId}")
     public void deletePhoto(@PathVariable Long photoId) {
         photoService.deletePhoto(photoId);
     }
+
 }

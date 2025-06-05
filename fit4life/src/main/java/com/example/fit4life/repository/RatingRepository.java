@@ -8,7 +8,7 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     // Additional query methods can be defined here if needed
     // For example, to find ratings by user and studio:
     Rating findByUserAndStudio(Long userId, Long studioId);
-
+    void deleteByUserId(Long userId);
     // 🔍 Find all ratings for a specific studio
     List<Rating> findByStudioId(Long studioId);
 }

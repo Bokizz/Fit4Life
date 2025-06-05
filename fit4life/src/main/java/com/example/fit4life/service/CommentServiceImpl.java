@@ -35,13 +35,13 @@ public class CommentServiceImpl implements CommentService{
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Studio studio = studioRepository.findById(studioId)
                 .orElseThrow(() -> new IllegalArgumentException("Studio not found"));
+        if(user.isChatRestricted()) {
+            throw new IllegalArgumentException("User is restricted from commenting");
+        } else {
         Comment comment = new Comment();
         comment.setContent(content);
         comment.setUser(user);
         comment.setStudio(studio);
-        if(user.isChatRestricted()) {
-            throw new IllegalArgumentException("User is restricted from commenting");
-        } else {
             return commentRepository.save(comment);
         }
     }
@@ -50,11 +50,30 @@ public class CommentServiceImpl implements CommentService{
     public Comment updateComment(Long id,String content){
         Comment existingComment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        if (existingComment.isEdited()) {
+            throw new IllegalArgumentException("Comment has already been edited");
+        }
+        if(existingComment.getUser().isChatRestricted()) {
+            throw new IllegalArgumentException("User is restricted from editing comments");
+        }
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("Content cannot be empty");
+        }
+        if (content.length() > 100) {
+            throw new IllegalArgumentException("Content exceeds maximum length of 100 characters");
+        }
         existingComment.setContent(content);
         existingComment.setEditedAt(LocalDateTime.now());
         existingComment.setEdited(true);
         return commentRepository.save(existingComment);
     }
+
+    @Override
+    public Comment getCommentById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+    }
+
     @Override
     public List<Comment> getCommentsByStudio(Long studioId) {
         Studio studio = studioRepository.findById(studioId)
@@ -69,14 +88,6 @@ public class CommentServiceImpl implements CommentService{
         return commentRepository.findByUserId(userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
-    @Override
-    public void deleteComment(Long id) {
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-            commentRepository.delete(comment);
-    }
-
     @Override
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
@@ -86,9 +97,13 @@ public class CommentServiceImpl implements CommentService{
     public List<Comment> getCommentsByUserAndStudio(Long userId, Long studioId) {
         return commentRepository.findByUserIdAndStudioId(userId, studioId);
     }
+    
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @Override
-    public Comment getCommentById(Long id) {
-        return commentRepository.findById(id)
+    public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+            commentRepository.delete(comment);
     }
+
 }

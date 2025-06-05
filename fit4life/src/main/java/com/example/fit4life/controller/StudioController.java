@@ -39,9 +39,9 @@ public class StudioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Studio> updateStudio(@PathVariable Long id, @RequestBody Studio studio) {
+    public ResponseEntity<Studio> updateStudio(@PathVariable Long id, @RequestParam String name, @RequestParam String location) {
         // Validate and update the studio
-        Studio updatedStudio = studioService.updateStudio(id, studio);
+        Studio updatedStudio = studioService.updateStudio(id, name, location);
         if (updatedStudio != null) {
             return ResponseEntity.ok(updatedStudio);
         } else {

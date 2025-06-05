@@ -1,6 +1,7 @@
 package com.example.fit4life.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.example.fit4life.model.Rating;
@@ -29,18 +30,20 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public Rating addOrUpdateRating(User user, Studio studio, int ratingValue) {
+    public Rating addOrUpdateRating(Long userId, Long studioId, int ratingValue) {
         // Check if the user has already rated the studio
-        Rating existingRating = ratingRepository.findByUserAndStudio(user.getId(), studio.getId());
+        Rating existingRating = ratingRepository.findByUserAndStudio(userId, studioId);
         if (existingRating != null) {
             existingRating.setRatingValue(ratingValue);
             return ratingRepository.save(existingRating);
         } else {
             // Create a new rating
             Rating newRating = new Rating();
-            newRating.setUser(user);
-            newRating.setStudio(studio);
+            newRating.setUser(userRepository.findById(userId).orElse(null));
+            newRating.setStudio(studioRepository.findById(studioId).orElse(null));
             newRating.setRatingValue(ratingValue);
+            newRating.setUser(userRepository.findById(userId).orElse(null));
+            newRating.setStudio(studioRepository.findById(studioId).orElse(null));
             return ratingRepository.save(newRating);
         }
     }
@@ -72,13 +75,35 @@ public class RatingServiceImpl implements RatingService {
         return ratingRepository.findByUserAndStudio(userId, studioId);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Override
     public void deleteRating(Long id) {
         // Delete rating by ID
+        // treba da se dodade i update na prosechna ocenka na studio, i da se izbrishe ratingot od studioto i userot
+        Rating rating = ratingRepository.findById(id).orElse(null);
+        if (rating == null) {
+            return;
+        }
+        Long studioId = rating.getStudio().getId();
+        User user = userRepository.findById(rating.getUser().getId()).orElse(null);
+        if (user != null) {
+            user.getRatings().remove(rating);
+        }else{
+            return; // If user does not exist, do nothing
+        }
+        studioRepository.findById(studioId).ifPresent(studio -> {
+            studio.getRatings().remove(rating);
+            studioRepository.save(studio);
+        });
+        updateAverageRating(studioId);
         ratingRepository.deleteById(id);
     }
 
-    private void updateAverageRating(Studio studio) {
+    private void updateAverageRating(Long studioId) {
+        Studio studio = studioRepository.findById(studioId).orElse(null);
+        if (studio == null) {
+            return;
+        }
         List<Rating> ratings = studio.getRatings();
         if (ratings == null || ratings.isEmpty()) {
             studio.setAverageRating(0.0);

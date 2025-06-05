@@ -28,13 +28,12 @@ public class StudioServiceImpl implements StudioService {
     }
 
     @Override
-    public Studio updateStudio(Long id, Studio studio) {
+    public Studio updateStudio(Long id, String name, String location) {
         // Validate and update the studio
         Studio existingStudio = studioRepository.findById(id).orElse(null);
         if (existingStudio != null) {
-            existingStudio.setName(studio.getName());
-            existingStudio.setLocation(studio.getLocation());
-            existingStudio.setType(studio.getType());
+            existingStudio.setName(name);
+            existingStudio.setLocation(location);
             updateAverageRating(existingStudio);
             return studioRepository.save(existingStudio);
         }

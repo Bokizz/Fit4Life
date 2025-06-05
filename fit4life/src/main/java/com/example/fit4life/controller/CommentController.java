@@ -38,6 +38,7 @@ public class CommentController {
         this.userService = userService;
         this.studioService = studioService;
     }
+    
     @PostMapping("/add")
     public ResponseEntity<Comment> addComment(@RequestBody String content,@PathVariable Long userId, @PathVariable Long studioId) {
         User user = userService.getUserById(userId);
