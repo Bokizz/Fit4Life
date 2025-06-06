@@ -47,12 +47,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsername(username).orElse(null);
     }
 
     @Override
     public User getUserByEmail(String email){
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override
@@ -109,10 +109,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getCurrentUser() {
          String username = SecurityContextHolder.getContext().getAuthentication().getName();
-         User user = userRepository.findByUsername(username);
-         if (user == null) {
-             throw new UsernameNotFoundException("Current user not found");
-         }
+         User user = userRepository.findByUsername(username)
+                 .orElseThrow(() -> new UsernameNotFoundException("Current user not found"));
          return user;
     }
 }
