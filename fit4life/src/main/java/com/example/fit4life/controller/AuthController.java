@@ -1,22 +1,24 @@
 package com.example.fit4life.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.fit4life.model.User;
+import com.example.fit4life.model.enumeration.Role;
 import com.example.fit4life.repository.UserRepository;
 import com.example.fit4life.security.CustomUserDetailsService;
 import com.example.fit4life.security.JwtUtil;
-import com.example.fit4life.model.enumeration.Role;
-import java.util.Map;
+import com.example.fit4life.security.TokenBlacklistService;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,6 +26,9 @@ public class AuthController {
     
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -62,5 +67,14 @@ public class AuthController {
         user.setPassword(userDetailsService.hashPassword(user.getPassword()));
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody String token){
+        String jwtToken = token.replace("Bearer","");
+        if(tokenBlacklistService.isTokenBlackListed(token)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token in blacklist already!");
+        }
+        tokenBlacklistService.blacklistToken(jwtToken);
+        return ResponseEntity.ok("Successfully logged out!");
     }
 }
