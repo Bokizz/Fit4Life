@@ -1,6 +1,8 @@
 package com.example.fit4life.soap.endpoint;
 import java.util.Optional;
 
+import org.proekt2.fit4life.AddPhotoRequest;
+import org.proekt2.fit4life.AddPhotoResponse;
 import org.proekt2.fit4life.BanUserRequest;
 import org.proekt2.fit4life.BanUserResponse;
 import org.proekt2.fit4life.ChatRestrictUserRequest;
@@ -14,6 +16,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import com.example.fit4life.model.Photo;
 import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.Subscription;
 import com.example.fit4life.model.User;
@@ -24,6 +27,7 @@ public class UserEndpoint {
     private static final String NAMESPACE_URI = "http://fit4life.com/fit4life/usersoap";
     private UserRepository userRepository;
     private StudioRepository studioRepository;
+    
     @PayloadRoot(namespace = NAMESPACE_URI, localPart="BanUserRequest")
     @ResponsePayload
     public BanUserResponse handleBanUser(@RequestPayload BanUserRequest request){
@@ -109,12 +113,41 @@ public class UserEndpoint {
 
             sub.setStudio(studio);
             sub.setUser(user);
+            sub.setDuration(request.getDuration());
 
             user.getSubscriptions().add(sub);
             userRepository.save(user);
 
             response.setStatus("SUCCESS");
             response.setMessage("User subscribed to studio successfully!");
+        }
+        return response;
+    }
+
+    @PayloadRoot(namespace=NAMESPACE_URI, localPart="AddPhotoRequest")
+    @ResponsePayload
+    public AddPhotoResponse handleAddPhoto(@RequestPayload AddPhotoRequest request){
+        AddPhotoResponse response = new AddPhotoResponse();
+
+        Optional<Studio> studioOpt = studioRepository.findById(request.getStudioId());
+        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+
+        if(studioOpt.isEmpty()){
+            response.setStatus("NO_ACTION");
+            response.setMessage("Studio not found!");
+        } else if(userOpt.isEmpty()){
+            response.setStatus("NO_ACTION");
+            response.setMessage("User not found!");
+        } else{
+            Studio studio = studioOpt.get();
+            User user = userOpt.get();
+            Photo photo = new Photo();
+
+            photo.setStudio(studio);
+            photo.setUploadedBy(user);
+
+            response.setStatus("SUCCESS");
+            response.setMessage("Photo added to studio "+studio.getName()+ "successfully by" +user.getUsername());
         }
         return response;
     }
