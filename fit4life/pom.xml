@@ -81,24 +81,41 @@
 		<groupId>io.jsonwebtoken</groupId>
 		<artifactId>jjwt-api</artifactId>
 		<version>0.11.5</version>
-	</dependency>
-	<dependency>
-		<groupId>io.jsonwebtoken</groupId>
-		<artifactId>jjwt-impl</artifactId>
-		<version>0.11.5</version>
-		<scope>runtime</scope>
-	</dependency>
-	<dependency>
-		<groupId>io.jsonwebtoken</groupId>
-		<artifactId>jjwt-jackson</artifactId>
-		<version>0.11.5</version>
-		<scope>runtime</scope>
-	</dependency>
+		</dependency>
 		<dependency>
-		<groupId>jakarta.servlet</groupId>
-		<artifactId>jakarta.servlet-api</artifactId>
-		<scope>provided</scope>
-	</dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+			<scope>runtime</scope>
+		</dependency>
+			<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.jaxb2.maven2</groupId>
+			<artifactId>maven-jaxb2-plugin</artifactId>
+			<version>0.14.0</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -127,6 +144,49 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!-- <plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${project.basedir}/src/main/resources/schema</schemaDirectory>
+							<includes>
+								<include>user.xsd</include>
+							</includes>
+							<packageName>com.example.fit4life.soap.user</packageName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+			<plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jaxb2-maven-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>xjc</id>
+                            <goals>
+                                <goal>xjc</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+						<sources>
+							<source>${project.basedir}/src/main/resources/schema</source>
+						</sources>
+						<includes>
+							<include>*.xsd</include>
+						</includes>
+						<outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+						<packageName>org.proekt2.fit4life</packageName>
+                    </configuration>
+                </plugin>
 		</plugins>
 	</build>
 
