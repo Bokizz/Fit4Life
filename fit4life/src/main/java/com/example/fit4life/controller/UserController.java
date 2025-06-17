@@ -46,6 +46,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create/studio")
     public ResponseEntity<Studio> createStudio(@RequestBody Studio studio){
         Studio createdStudio = userService.createStudio(studio);

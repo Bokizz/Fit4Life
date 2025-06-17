@@ -7,10 +7,14 @@ import org.proekt2.fit4life.BanUserRequest;
 import org.proekt2.fit4life.BanUserResponse;
 import org.proekt2.fit4life.ChatRestrictUserRequest;
 import org.proekt2.fit4life.ChatRestrictUserResponse;
+import org.proekt2.fit4life.ChatUnrestrictUserRequest;
+import org.proekt2.fit4life.ChatUnrestrictUserResponse;
 import org.proekt2.fit4life.ResetPasswordRequest;
 import org.proekt2.fit4life.ResetPasswordResponse;
 import org.proekt2.fit4life.SubscribeStudioRequest;
 import org.proekt2.fit4life.SubscribeStudioResponse;
+import org.proekt2.fit4life.UnBanUserRequest;
+import org.proekt2.fit4life.UnBanUserResponse;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -36,12 +40,33 @@ public class UserEndpoint {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
         if(userOpt.isPresent()){
             if (request.isBanned()){
-                User user =userOpt.get();
+                User user = userOpt.get();
                 user.setBanned(true);
                 userRepository.save(user);
 
                 response.setStatus("SUCCESS");
                 response.setMessage("User " + request.getUsername() + " has been banned.");
+            }else{
+                response.setStatus("NO_ACTION");
+                response.setMessage("Ban flag was false - no action taken.");
+            }
+        }
+        return response;
+    }
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart="UnBanUserRequest")
+    @ResponsePayload
+    public UnBanUserResponse handleUnBanUser(@RequestPayload UnBanUserRequest request){
+        UnBanUserResponse response = new UnBanUserResponse();
+
+        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+        if(userOpt.isPresent()){
+            if (request.isUnban()){
+                User user = userOpt.get();
+                user.setBanned(false);
+                userRepository.save(user);
+
+                response.setStatus("SUCCESS");
+                response.setMessage("User " + request.getUsername() + " has been unbanned.");
             }else{
                 response.setStatus("NO_ACTION");
                 response.setMessage("Ban flag was false - no action taken.");
@@ -57,7 +82,7 @@ public class UserEndpoint {
 
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
         if(userOpt.isPresent()){
-            if(request.isChatRestricted()){
+            if(request.isChatRestrict()){
                 User user = userOpt.get();
                 user.setChatRestricted(true);
                 userRepository.save(user);
@@ -67,6 +92,28 @@ public class UserEndpoint {
             }else{
                 response.setStatus("NO_ACTION");
                 response.setMessage("ChatRestrict flag was false - no action taken.");
+            }
+        }
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart="ChatUnrestrictUserRequest")
+    @ResponsePayload
+    public ChatUnrestrictUserResponse handleChatUnrestrictUser(@RequestPayload ChatUnrestrictUserRequest request){
+        ChatUnrestrictUserResponse response = new ChatUnrestrictUserResponse();
+
+        Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
+        if(userOpt.isPresent()){
+            if(request.isChatUnrestrict()){
+                User user = userOpt.get();
+                user.setChatRestricted(false);
+                userRepository.save(user);
+                
+                response.setStatus("SUCCESS");
+                response.setMessage("User " + request.getUsername() + " has been unrestricted.");
+            }else{
+                response.setStatus("NO_ACTION");
+                response.setMessage("ChatUnrestrict flag was false - no action taken.");
             }
         }
         return response;

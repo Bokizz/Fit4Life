@@ -31,7 +31,7 @@ public class StudioController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Studio> createStudio(@RequestBody Studio studio) {
         // Validate and save the studio
         Studio createdStudio = studioService.createStudio(studio);

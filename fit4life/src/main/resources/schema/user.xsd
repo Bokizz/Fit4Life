@@ -21,15 +21,49 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="UnBanUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string"/>
+                <xs:element name="unban" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UnBanUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:string"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="ChatRestrictUserRequest">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="username" type="xs:string"/>
-                <xs:element name="chatRestricted" type="xs:boolean"/>
+                <xs:element name="ChatRestrict" type="xs:boolean"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="ChatRestrictUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:string"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ChatUnrestrictUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string"/>
+                <xs:element name="chatUnrestrict" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ChatUnrestrictUserResponse">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="status" type="xs:string"/>
