@@ -100,8 +100,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restrictChat(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        user.setChatRestricted(true);
-        userRepository.save(user);
+        if ("ADMIN".equals(user.getRole()) || "MODERATOR".equals(user.getRole())) {
+            throw new IllegalArgumentException("Cannot chat restrict admins or moderators!");
+        }else{
+            user.setChatRestricted(true);
+            userRepository.save(user);
+        }
+        
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
