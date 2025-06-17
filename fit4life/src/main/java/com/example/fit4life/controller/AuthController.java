@@ -64,7 +64,7 @@ public class AuthController {
         }
         user.setRole(Role.USER);
         
-        user.setPassword(userDetailsService.hashPassword(user.getPassword()));
+        user.setPassword(CustomUserDetailsService.hashPassword(user.getPassword()));
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
