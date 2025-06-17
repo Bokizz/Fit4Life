@@ -8,15 +8,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.User;
+import com.example.fit4life.repository.StudioRepository;
 import com.example.fit4life.repository.UserRepository;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-
+    private final StudioRepository studioRepository;
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, StudioRepository studioRepository) {
         this.userRepository = userRepository;
+        this.studioRepository = studioRepository;
     }
 
     @Override
@@ -28,6 +31,19 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email already exists");
         }
         return userRepository.save(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public Studio createStudio(Studio studio){
+        if(studioRepository.existsById(studio.getId())){
+            throw new IllegalArgumentException("Studio already exists");
+        }
+        if(studioRepository.findByName(studio.getName()) != null){
+            throw new IllegalArgumentException("Studio name already exists");
+        }
+        studio.setAverageRating(0.0);
+        return studioRepository.save(studio);
     }
 
     @Override
@@ -112,6 +128,13 @@ public class UserServiceImpl implements UserService {
          User user = userRepository.findByUsername(username)
                  .orElseThrow(() -> new UsernameNotFoundException("Current user not found"));
          return user;
+    }
+    
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public void deleteStudio(Long studioId){
+        Studio studio = studioRepository.findById(studioId).orElseThrow(() -> new IllegalArgumentException("Studio not found"));
+        studioRepository.delete(studio);
     }
 }
 

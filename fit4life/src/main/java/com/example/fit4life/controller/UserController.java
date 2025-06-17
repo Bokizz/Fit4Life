@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.User;
 import com.example.fit4life.service.CommentService;
 import com.example.fit4life.service.PhotoService;
@@ -43,6 +44,12 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
         return ResponseEntity.ok(createdUser);
+    }
+
+    @PostMapping("/create/studio")
+    public ResponseEntity<Studio> createStudio(@RequestBody Studio studio){
+        Studio createdStudio = userService.createStudio(studio);
+        return ResponseEntity.ok(createdStudio);
     }
 
     @PutMapping("/update/{userId}/{username}")
@@ -137,6 +144,13 @@ public class UserController {
     @DeleteMapping("/delete/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{studioId}")
+    public ResponseEntity<Void> deleteStudio(@PathVariable Long studioId){
+        userService.deleteStudio(studioId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,10 +1,12 @@
 package com.example.fit4life.service;
 import java.util.List;
 
+import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.User;
 
 public interface UserService {
     User createUser(User user);
+    Studio createStudio(Studio studio);
     User updateUser(Long id, String username);
     User getUserById(Long id);
     User getUserByUsername(String username);
@@ -15,6 +17,6 @@ public interface UserService {
     void restrictChat(Long id);
     void unrestrictChat(Long id);
     void deleteUser(Long id);
+    void deleteStudio(Long studioId);
     User getCurrentUser();
-
 }   
