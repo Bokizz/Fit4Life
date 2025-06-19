@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.fit4life.model.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByUserIdAndStudioId(Long userId, Long studioId);
-    List<Comment> findByUserId(Long userId);
-    List<Comment> findByStudioId(Long studioId);
-    void deleteByUserId(Long userId);
-    
+    List<Comment> findByUser_IdAndStudio_Id(Long userId, Long studioId);
+    List<Comment> findByUser_Id(Long userId);
+    List<Comment> findByStudio_Id(Long studioId);    
 }

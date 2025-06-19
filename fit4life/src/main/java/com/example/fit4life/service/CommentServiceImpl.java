@@ -80,14 +80,14 @@ public class CommentServiceImpl implements CommentService{
     public List<Comment> getCommentsByStudio(Long studioId) {
         Studio studio = studioRepository.findById(studioId)
                 .orElseThrow(() -> new IllegalArgumentException("Studio not found"));
-        return commentRepository.findByStudioId(studioId);
+        return commentRepository.findByStudio_Id(studioId);
     }
 
     @Override
     public List<Comment> getCommentsByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return commentRepository.findByUserId(userId);
+        return commentRepository.findByUser_Id(userId);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public List<Comment> getCommentsByUserAndStudio(Long userId, Long studioId) {
-        return commentRepository.findByUserIdAndStudioId(userId, studioId);
+        return commentRepository.findByUser_IdAndStudio_Id(userId, studioId);
     }
     
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")

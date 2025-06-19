@@ -1,11 +1,11 @@
 package com.example.fit4life.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fit4life.model.Rating;
 import com.example.fit4life.model.Studio;
@@ -29,33 +29,77 @@ public class RatingServiceImpl implements RatingService {
         this.studioRepository = studioRepository;
     }
 
+    // @Override
+    // public Rating addOrUpdateRating(Long userId, Long studioId, int ratingValue) {
+    //     // Check if the user has already rated the studio
+    //     Rating existingRating = ratingRepository.findByUserAndStudio(userId, studioId);
+    //     if (existingRating != null) {
+    //         existingRating.setRatingValue(ratingValue);
+    //         Optional<Studio> studioOpt = studioRepository.findById(studioId);
+    //         if (studioOpt.isPresent()) {
+    //             Studio studio = studioOpt.get();
+    //             // No need to addOrUpdateRating, just update the average rating
+    //             updateAverageRating(studioId);
+    //         }
+    //         return ratingRepository.save(existingRating);
+    //     } else {
+    //         Optional<User> user = userRepository.findById(userId);
+    //         Optional<Studio> studio = studioRepository.findById(studioId);
+    //         if(user.isEmpty() || studio.isEmpty()) {
+    //             throw new IllegalArgumentException("User or Studio not found");
+    //         }
+    //         if(user.get().isBanned()) {
+    //             throw new IllegalArgumentException("User is banned and cannot rate studios");
+    //         }
+    //         if(ratingValue < 1 || ratingValue > 10) {
+    //             throw new IllegalArgumentException("Rating value must be between 1 and 10");
+    //         }
+    //         // Create a new rating
+    //         Rating newRating = new Rating();
+    //         newRating.setRatingValue(ratingValue);
+    //         newRating.setUser(user.get());
+    //         newRating.setStudio(studio.get());
+    //         return ratingRepository.save(newRating);
+    //     }
+    // }
     @Override
+    @Transactional
     public Rating addOrUpdateRating(Long userId, Long studioId, int ratingValue) {
-        // Check if the user has already rated the studio
-        Rating existingRating = ratingRepository.findByUserAndStudio(userId, studioId);
-        if (existingRating != null) {
-            existingRating.setRatingValue(ratingValue);
-            return ratingRepository.save(existingRating);
-        } else {
-            Optional<User> user = userRepository.findById(userId);
-            Optional<Studio> studio = studioRepository.findById(studioId);
-            if(user.isEmpty() || studio.isEmpty()) {
-                throw new IllegalArgumentException("User or Studio not found");
-            }
-            if(user.get().isBanned()) {
-                throw new IllegalArgumentException("User is banned and cannot rate studios");
-            }
-            if(ratingValue < 1 || ratingValue > 10) {
-                throw new IllegalArgumentException("Rating value must be between 1 and 10");
-            }
-            // Create a new rating
-            Rating newRating = new Rating();
-            newRating.setRatingValue(ratingValue);
-            newRating.setUser(user.get());
-            newRating.setStudio(studio.get());
-            return ratingRepository.save(newRating);
-        }
+    // Validate rating value first
+    if (ratingValue < 1 || ratingValue > 10) {
+        throw new IllegalArgumentException("Rating value must be between 1 and 10");
     }
+
+    // Check if the user has already rated the studio
+    Rating existingRating = ratingRepository.findByUserAndStudio(userId, studioId);
+    
+    if (existingRating != null) {
+        // Update existing rating
+        existingRating.setRatingValue(ratingValue);
+        ratingRepository.save(existingRating);
+    } else {
+        // Create new rating
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        if (user.isBanned()) {
+            throw new IllegalArgumentException("User is banned and cannot rate studios");
+        }
+
+        Studio studio = studioRepository.findById(studioId)
+            .orElseThrow(() -> new IllegalArgumentException("Studio not found"));
+
+        Rating newRating = new Rating();
+        newRating.setRatingValue(ratingValue);
+        newRating.setUser(user);
+        newRating.setStudio(studio);
+        ratingRepository.save(newRating);
+    }
+
+    updateAverageRating(studioId);
+    
+    return ratingRepository.findByUserAndStudio(userId, studioId);
+}
 
     @Override
     public List<Rating> getAllRatings() {
@@ -67,7 +111,7 @@ public class RatingServiceImpl implements RatingService {
     public List<Rating> getRatingsByStudio(Long studioId){
         Studio studio = studioRepository.findById(studioId).orElse(null);
         if (studio != null) {
-            return ratingRepository.findByStudioId(studioId);
+            return ratingRepository.findByStudio_Id(studioId);
         }else {
             return List.of(); // Return an empty list if the studio does not exist
         }
@@ -109,7 +153,7 @@ public class RatingServiceImpl implements RatingService {
     }
     @Override
     public List<Rating> getRatingsByUser(Long userId) {
-        return ratingRepository.findByUserId(userId);
+        return ratingRepository.findByUser_Id(userId);
     }
 
     private void updateAverageRating(Long studioId) {

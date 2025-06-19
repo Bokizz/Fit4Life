@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 })
 public class Subscription {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -25,7 +26,10 @@ public class Subscription {
 
     @ManyToOne(optional = false)
     private Studio studio;
-
+    @Transient  // Not persisted in DB
+    private Long studioId; 
+    @Transient  // Not persisted in DB
+    private Long userId;
     private int duration;
 
     // Getters and Setters
@@ -51,5 +55,19 @@ public class Subscription {
     }
     public void setDuration(int duration) {
         this.duration = duration;
+    }
+    
+    public Long getUserId(){
+        return this.userId;
+    }
+    public void setUserId(Long userId){
+        this.userId = userId;
+    }
+
+    public Long getStudioId(){
+        return this.studioId;
+    }
+    public void setStudioId(Long studioId){
+        this.studioId = studioId;
     }
 }

@@ -29,20 +29,19 @@ public class PhotoController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
-    public Photo uploadPhoto(@RequestBody Photo photo, @PathVariable Long userId, @PathVariable Long studioId,
-                             @RequestParam String url, @RequestParam String description) {
-        return photoService.uploadPhoto(photo, userId, studioId, url, description);
+    public Photo uploadPhoto( @RequestBody Photo photo) {
+        return photoService.uploadPhoto(photo);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{photoId}")
-    public Photo updatePhoto(@PathVariable Long photoId, @RequestBody Photo photo,
+    public Photo updatePhoto(@PathVariable Long photoId,
                              @RequestParam String url, @RequestParam String description) throws NotFoundException {
         Photo existingPhoto = photoService.getPhotoById(photoId);
         if (existingPhoto == null) {
             throw new NotFoundException();
         }
-        return photoService.updatePhoto(photo, url, description);
+        return photoService.updatePhoto(photoId, url, description);
     }
 
     @GetMapping("/studio/{studioId}")

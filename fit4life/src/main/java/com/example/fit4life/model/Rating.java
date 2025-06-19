@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -19,13 +20,16 @@ import lombok.NoArgsConstructor;
 })
 public class Rating {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
+    @Transient  // Not persisted in DB
+    private Long studioId; 
+    @Transient  // Not persisted in DB
+    private Long userId;
     @ManyToOne
     @JoinColumn(name = "studio_id", nullable = false)
     private Studio studio;
@@ -57,5 +61,19 @@ public class Rating {
 
     public void setRatingValue(int ratingValue) {
         this.ratingValue = ratingValue;
+    }
+    
+    public Long getUserId(){
+        return this.userId;
+    }
+    public void setUserId(Long userId){
+        this.userId = userId;
+    }
+
+    public Long getStudioId(){
+        return this.studioId;
+    }
+    public void setStudioId(Long studioId){
+        this.studioId = studioId;
     }
 }

@@ -1,13 +1,15 @@
 package com.example.fit4life.service;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.example.fit4life.model.Photo;
-import com.example.fit4life.repository.PhotoRepository;
-import com.example.fit4life.repository.UserRepository;
-import com.example.fit4life.repository.StudioRepository;
-import com.example.fit4life.model.User;
 import com.example.fit4life.model.Studio;
+import com.example.fit4life.model.User;
+import com.example.fit4life.repository.PhotoRepository;
+import com.example.fit4life.repository.StudioRepository;
+import com.example.fit4life.repository.UserRepository;
 
 @Service
 public class PhotoServiceImpl implements PhotoService {
@@ -23,18 +25,18 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public Photo uploadPhoto(Photo photo, Long userId, Long studioId,String url, String description){
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Studio studio = studioRepository.findById(studioId).orElseThrow(() -> new RuntimeException("Studio not found"));
-        photo.setStudio(studio);
+    public Photo uploadPhoto(Photo photo){
+        User user = userRepository.findById(photo.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+        Studio studio = studioRepository.findById(photo.getStudioId()).orElseThrow(() -> new RuntimeException("Studio not found"));
         photo.setUploadedBy(user);
-        photo.setUrl(url);
-        photo.setDescription(description);
+        photo.setStudio(studio);
         return photoRepository.save(photo);
     }
 
     @Override
-    public Photo updatePhoto(Photo photo, String url, String description){
+    public Photo updatePhoto(Long photoId, String url, String description){
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new RuntimeException("Photo not found"));
         photo.setUrl(url);
         photo.setDescription(description);
         return photoRepository.save(photo);

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.fit4life.model.Rating;
 import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.enumeration.StudioType;
+import com.example.fit4life.repository.RatingRepository;
 import com.example.fit4life.repository.StudioRepository;
 
 @Service
@@ -16,14 +17,16 @@ public class StudioServiceImpl implements StudioService {
     // Autowired dependencies
     private final StudioRepository studioRepository;
 
+    private final RatingRepository ratingRepository;
     @Autowired
-    public StudioServiceImpl(StudioRepository studioRepository) {
+    public StudioServiceImpl(StudioRepository studioRepository,RatingRepository ratingRepository) {
         this.studioRepository = studioRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @Override
     public Studio createStudio(Studio studio) {
-        // Validate and save the studio
+        studio.setAverageRating(0.0);
         return studioRepository.save(studio);
     }
 
@@ -34,7 +37,7 @@ public class StudioServiceImpl implements StudioService {
         if (existingStudio != null) {
             existingStudio.setName(name);
             existingStudio.setLocation(location);
-            updateAverageRating(existingStudio);
+            updateAverageRating(existingStudio.getId());
             return studioRepository.save(existingStudio);
         }
         return null;
@@ -79,17 +82,39 @@ public class StudioServiceImpl implements StudioService {
     public void deleteStudio(Long id) {
         studioRepository.deleteById(id);
     }
-    private void updateAverageRating(Studio studio) {
-        List<Rating> ratings = studio.getRatings();
-        if (ratings == null || ratings.isEmpty()) {
-            studio.setAverageRating(0.0);
-            return;
-        }
-        double sum = 0.0;
-        for (Rating rating : ratings) {
-            sum += rating.getRatingValue();
-        }
-        studio.setAverageRating(sum / ratings.size());
-    }
+    // private void updateAverageRating(Studio studio) {
+    //     List<Rating> ratings = studio.getRatings();
+    //     if (ratings == null || ratings.isEmpty()) {
+    //         Rating rating = new Rating();
+    //         rating.setStudio(studio);
+    //         rating.setRatingValue(0);
+    //         studio.getRatings().add(rating);
+    //         studio.setAverageRating(0.0);
+    //         return;
+    //     }
+    //     double sum = 0.0;
+    //     for (Rating rating : ratings) {
+    //         sum += rating.getRatingValue();
+    //     }
+    //     studio.setAverageRating(sum / ratings.size());
+    // }
 
+    private void updateAverageRating(Long studioId) {
+    Studio studio = studioRepository.findById(studioId)
+        .orElseThrow(() -> new IllegalArgumentException("Studio not found"));
+    
+    List<Rating> ratings = ratingRepository.findByStudio_Id(studioId);
+    
+    if (ratings.isEmpty()) {
+        studio.setAverageRating(0.0);
+    } else {
+        double sum = ratings.stream()
+            .mapToInt(Rating::getRatingValue)
+            .average()
+            .orElse(0.0);
+        studio.setAverageRating(sum);
+    }
+    
+    studioRepository.save(studio);
+}
 }

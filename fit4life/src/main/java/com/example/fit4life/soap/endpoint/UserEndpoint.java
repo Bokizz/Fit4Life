@@ -15,6 +15,7 @@ import org.proekt2.fit4life.SubscribeStudioRequest;
 import org.proekt2.fit4life.SubscribeStudioResponse;
 import org.proekt2.fit4life.UnBanUserRequest;
 import org.proekt2.fit4life.UnBanUserResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -24,13 +25,21 @@ import com.example.fit4life.model.Photo;
 import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.Subscription;
 import com.example.fit4life.model.User;
+import com.example.fit4life.repository.PhotoRepository;
 import com.example.fit4life.repository.StudioRepository;
+import com.example.fit4life.repository.SubscriptionRepository;
 import com.example.fit4life.repository.UserRepository;
 @Endpoint
 public class UserEndpoint {
-    private static final String NAMESPACE_URI = "http://fit4life.com/fit4life/usersoap";
+    private static final String NAMESPACE_URI = "http://fit4life.com/usersoap";
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private StudioRepository studioRepository;
+    @Autowired
+    private PhotoRepository photoRepository;
+    @Autowired
+    private SubscriptionRepository subRepository;
     
     @PayloadRoot(namespace = NAMESPACE_URI, localPart="BanUserRequest")
     @ResponsePayload
@@ -161,10 +170,7 @@ public class UserEndpoint {
             sub.setStudio(studio);
             sub.setUser(user);
             sub.setDuration(request.getDuration());
-
-            user.getSubscriptions().add(sub);
-            userRepository.save(user);
-
+            subRepository.save(sub);
             response.setStatus("SUCCESS");
             response.setMessage("User subscribed to studio successfully!");
         }
@@ -189,10 +195,12 @@ public class UserEndpoint {
             Studio studio = studioOpt.get();
             User user = userOpt.get();
             Photo photo = new Photo();
-
+            photo.setUploadedBy(user);
             photo.setStudio(studio);
             photo.setUploadedBy(user);
-
+            photo.setDescription(request.getDescription());
+            photo.setUrl(request.getPhotoUrl());
+            photoRepository.save(photo);
             response.setStatus("SUCCESS");
             response.setMessage("Photo added to studio "+studio.getName()+ "successfully by" +user.getUsername());
         }

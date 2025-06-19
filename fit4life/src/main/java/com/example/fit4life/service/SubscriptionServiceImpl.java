@@ -52,7 +52,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public void cancelSubscription(Long userId, Long studioId){
-        Subscription subscription = subscriptionRepository.findByUserIdAndStudioId(userId, studioId);
+        Subscription subscription = subscriptionRepository.findByUser_IdAndStudio_Id(userId, studioId);
         if (subscription != null) {
             subscriptionRepository.delete(subscription);
             userRepository.findById(userId).ifPresent(user -> {
@@ -76,7 +76,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (!studioRepository.existsById(studioId)) {
             throw new IllegalArgumentException("Studio not found");
         }
-        return subscriptionRepository.findByUserIdAndStudioId(userId, studioId);
+        return subscriptionRepository.findByUser_IdAndStudio_Id(userId, studioId);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (!userRepository.existsById(userId)) {
             throw new IllegalArgumentException("User not found");
         }
-        return subscriptionRepository.findByUserId(userId);
+        return subscriptionRepository.findByUser_Id(userId);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (!studioRepository.existsById(studioId)) {
             throw new IllegalArgumentException("Studio not found");
         }
-        return subscriptionRepository.findByStudioId(studioId);
+        return subscriptionRepository.findByStudio_Id(studioId);
     }
 
     @Override

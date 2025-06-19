@@ -3,7 +3,6 @@ package com.example.fit4life.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,10 +34,10 @@ public class StudioController {
     public ResponseEntity<Studio> createStudio(@RequestBody Studio studio) {
         // Validate and save the studio
         Studio createdStudio = studioService.createStudio(studio);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdStudio);
+        return ResponseEntity.ok(createdStudio);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Studio> updateStudio(@PathVariable Long id, @RequestParam String name, @RequestParam String location) {
         // Validate and update the studio
         Studio updatedStudio = studioService.updateStudio(id, name, location);
@@ -48,7 +47,7 @@ public class StudioController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Studio> getStudioById(@PathVariable Long id) {
         // Retrieve studio by ID
         Studio studio = studioService.getStudioById(id);
@@ -66,7 +65,7 @@ public class StudioController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteStudio(@PathVariable Long id) {
         // Delete studio by ID
         studioService.deleteStudio(id);

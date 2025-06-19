@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class Comment {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -39,7 +40,12 @@ public class Comment {
     @JoinColumn(name = "studio_id")
     private Studio studio;
 
-    public long getId() {
+    @Transient  // Not persisted in DB
+    private Long studioId; 
+    @Transient  // Not persisted in DB
+    private Long userId;
+
+    public Long getId() {
         return id;
     }
 
@@ -78,6 +84,21 @@ public class Comment {
     }
     public void setStudio(Studio studio) {
         this.studio = studio;
+    }
+
+    
+    public Long getUserId(){
+        return this.userId;
+    }
+    public void setUserId(Long userId){
+        this.userId = userId;
+    }
+
+    public Long getStudioId(){
+        return this.studioId;
+    }
+    public void setStudioId(Long studioId){
+        this.studioId = studioId;
     }
 
 }

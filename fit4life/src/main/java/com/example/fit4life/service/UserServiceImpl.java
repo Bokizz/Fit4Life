@@ -3,7 +3,6 @@ package com.example.fit4life.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -33,18 +32,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public Studio createStudio(Studio studio){
-        if(studioRepository.existsById(studio.getId())){
-            throw new IllegalArgumentException("Studio already exists");
-        }
-        if(studioRepository.findByName(studio.getName()) != null){
-            throw new IllegalArgumentException("Studio name already exists");
-        }
-        studio.setAverageRating(0.0);
-        return studioRepository.save(studio);
-    }
+    // @Override
+    // public Studio createStudio(Studio studio){
+    //     if(studioRepository.existsById(studio.getId())){
+    //         throw new IllegalArgumentException("Studio already exists");
+    //     }
+    //     if(studioRepository.findByName(studio.getName()) != null){
+    //         throw new IllegalArgumentException("Studio name already exists");
+    //     }
+    //     studio.setAverageRating(0.0);
+    //     return studioRepository.save(studio);
+    // }
 
     @Override
     public User updateUser(Long id, String username) {
@@ -76,7 +74,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void banUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -88,7 +85,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
     
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void unbanUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -96,7 +92,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @Override
     public void restrictChat(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -109,7 +104,6 @@ public class UserServiceImpl implements UserService {
         
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @Override
     public void unrestrictChat(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -117,7 +111,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -135,7 +128,6 @@ public class UserServiceImpl implements UserService {
          return user;
     }
     
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteStudio(Long studioId){
         Studio studio = studioRepository.findById(studioId).orElseThrow(() -> new IllegalArgumentException("Studio not found"));

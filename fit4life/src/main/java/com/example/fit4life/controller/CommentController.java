@@ -1,28 +1,25 @@
 package com.example.fit4life.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.example.fit4life.service.CommentService;
-import com.example.fit4life.service.UserService;
-import com.example.fit4life.service.StudioService;
 import com.example.fit4life.model.Comment;
-import com.example.fit4life.model.User;
 import com.example.fit4life.model.Studio;
-
-import java.security.Principal;
-import java.time.LocalDateTime;
-
-import java.util.List;
+import com.example.fit4life.model.User;
+import com.example.fit4life.service.CommentService;
+import com.example.fit4life.service.StudioService;
+import com.example.fit4life.service.UserService;
 
 
 @RestController
@@ -40,7 +37,7 @@ public class CommentController {
     }
     
     @PostMapping("/add")
-    public ResponseEntity<Comment> addComment(@RequestBody String content,@PathVariable Long userId, @PathVariable Long studioId) {
+    public ResponseEntity<Comment> addComment(@RequestParam String content,@RequestParam Long userId, @RequestParam Long studioId) {
         User user = userService.getUserById(userId);
         Studio studio = studioService.getStudioById(studioId);
         if (user == null || studio == null) {
@@ -50,14 +47,11 @@ public class CommentController {
             return ResponseEntity.badRequest().body(null); // User is restricted from commenting
         }
         Comment createdComment = commentService.addComment(content, userId, studioId);
-        if (createdComment == null) {
-            return ResponseEntity.badRequest().build(); // Handle case where comment could not be created
-        }
         return ResponseEntity.ok(createdComment);
     }
 
-    @PutMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestBody String content) {
+    @PutMapping("/update/{commentId}")
+    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestParam String content) {
         Comment comment = commentService.getCommentById(commentId);
         if (comment == null) {
             return ResponseEntity.notFound().build(); // Comment not found
@@ -100,7 +94,7 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Comment>> getAllComments() {
         List<Comment> comments = commentService.getAllComments();
         if (comments == null || comments.isEmpty()) {
@@ -117,7 +111,7 @@ public class CommentController {
         return ResponseEntity.ok(comments);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/delete/{commentId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
         Comment comment = commentService.getCommentById(commentId);

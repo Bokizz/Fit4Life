@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.fit4life.model.Studio;
 import com.example.fit4life.model.User;
 import com.example.fit4life.service.CommentService;
 import com.example.fit4life.service.PhotoService;
@@ -40,18 +40,24 @@ public class UserController {
         this.photoService = photoService;
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> whoAmI(Authentication authentication) {
+    return ResponseEntity.ok(authentication);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
         return ResponseEntity.ok(createdUser);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create/studio")
-    public ResponseEntity<Studio> createStudio(@RequestBody Studio studio){
-        Studio createdStudio = userService.createStudio(studio);
-        return ResponseEntity.ok(createdStudio);
-    }
+    // @PreAuthorize("hasRole('ADMIN')")
+    // @PostMapping("/create/studio")
+    // public ResponseEntity<Studio> createStudio(@RequestBody Studio studio){
+    //     Studio createdStudio = userService.createStudio(studio);
+    //     return ResponseEntity.ok(createdStudio);
+    // }
 
     @PutMapping("/update/{userId}/{username}")
     public ResponseEntity<User> updateUser(@PathVariable Long userId, @PathVariable String username) {
@@ -74,14 +80,14 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser() {
-        User user = userService.getCurrentUser();
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user);
-    }
+    // @GetMapping("/me")
+    // public ResponseEntity<User> getCurrentUser() {
+    //     User user = userService.getCurrentUser();
+    //     if (user == null) {
+    //         return ResponseEntity.notFound().build();
+    //     }
+    //     return ResponseEntity.ok(user);
+    // }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
